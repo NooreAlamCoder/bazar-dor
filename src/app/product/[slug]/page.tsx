@@ -5,7 +5,10 @@ import { getProducts } from "@/lib/api";
 import type { Product } from "@/types/product";
 
 function toBanglaNumber(value: number | string) {
-  return String(value).replace(/\d/g, (digit) => "০১২৩৪৫৬৭৮৯"[Number(digit)]);
+  return String(value).replace(
+    /\d/g,
+    (digit) => "০১২৩৪৫৬৭৮৯"[Number(digit)]
+  );
 }
 
 function getUnit(unit: string) {
@@ -19,7 +22,13 @@ function getUnit(unit: string) {
   return units[unit] || unit;
 }
 
-async function ProductContent({ slug }: { slug: string }) {
+async function ProductContent({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+
   const products = await getProducts();
 
   const product = products.find((item) => item.slug === slug);
@@ -33,12 +42,18 @@ async function ProductContent({ slug }: { slug: string }) {
     market.max,
   ]);
 
-  const minimumPrice = prices.length ? Math.min(...prices) : product.today;
-  const maximumPrice = prices.length ? Math.max(...prices) : product.today;
+  const minimumPrice = prices.length
+    ? Math.min(...prices)
+    : product.today;
+
+  const maximumPrice = prices.length
+    ? Math.max(...prices)
+    : product.today;
 
   const averagePrice =
     prices.length > 0
-      ? prices.reduce((total, price) => total + price, 0) / prices.length
+      ? prices.reduce((total, price) => total + price, 0) /
+        prices.length
       : product.today;
 
   return (
@@ -48,10 +63,16 @@ async function ProductContent({ slug }: { slug: string }) {
         <Link href="/" className="hover:text-green-600">
           হোম
         </Link>
+
         <span className="mx-2">/</span>
+
         <span>{product.categoryNameBn}</span>
+
         <span className="mx-2">/</span>
-        <span className="text-gray-800">{product.nameBn}</span>
+
+        <span className="text-gray-800">
+          {product.nameBn}
+        </span>
       </div>
 
       {/* Product Header */}
@@ -66,7 +87,8 @@ async function ProductContent({ slug }: { slug: string }) {
           <div>
             <div className="mb-4 flex flex-wrap gap-2">
               <span className="rounded-full bg-green-50 px-4 py-2 text-sm font-semibold text-green-700">
-                {product.categoryIcon} {product.categoryNameBn}
+                {product.categoryIcon}{" "}
+                {product.categoryNameBn}
               </span>
 
               <span className="rounded-full bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700">
@@ -79,13 +101,17 @@ async function ProductContent({ slug }: { slug: string }) {
             </h1>
 
             <p className="mt-4 leading-8 text-gray-600">
-              {product.nameBn} এর আজকের বাজারদর এবং বিভিন্ন বাজারের
-              সর্বনিম্ন ও সর্বোচ্চ দামের তথ্য এখানে এক নজরে দেখা যাবে।
+              {product.nameBn} এর আজকের বাজারদর এবং বিভিন্ন
+              বাজারের সর্বনিম্ন ও সর্বোচ্চ দামের তথ্য এখানে
+              এক নজরে দেখা যাবে।
             </p>
 
             <div className="mt-6 flex flex-wrap items-end gap-4">
               <div>
-                <p className="text-sm text-gray-500">আজকের দাম</p>
+                <p className="text-sm text-gray-500">
+                  আজকের দাম
+                </p>
+
                 <p className="text-4xl font-extrabold text-green-700">
                   ৳{toBanglaNumber(product.today)}
                 </p>
@@ -120,28 +146,40 @@ async function ProductContent({ slug }: { slug: string }) {
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">আজকের দাম</p>
+            <p className="text-sm text-gray-500">
+              আজকের দাম
+            </p>
+
             <p className="mt-2 text-2xl font-bold text-green-700">
               ৳{toBanglaNumber(product.today)}
             </p>
           </div>
 
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">সর্বনিম্ন দাম</p>
+            <p className="text-sm text-gray-500">
+              সর্বনিম্ন দাম
+            </p>
+
             <p className="mt-2 text-2xl font-bold text-gray-900">
               ৳{toBanglaNumber(minimumPrice)}
             </p>
           </div>
 
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">সর্বোচ্চ দাম</p>
+            <p className="text-sm text-gray-500">
+              সর্বোচ্চ দাম
+            </p>
+
             <p className="mt-2 text-2xl font-bold text-gray-900">
               ৳{toBanglaNumber(maximumPrice)}
             </p>
           </div>
 
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">গড় দাম</p>
+            <p className="text-sm text-gray-500">
+              গড় দাম
+            </p>
+
             <p className="mt-2 text-2xl font-bold text-gray-900">
               ৳{toBanglaNumber(averagePrice.toFixed(0))}
             </p>
@@ -157,21 +195,30 @@ async function ProductContent({ slug }: { slug: string }) {
 
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
-            <p className="text-sm text-gray-500">গতকাল</p>
+            <p className="text-sm text-gray-500">
+              গতকাল
+            </p>
+
             <p className="mt-2 text-xl font-bold">
               ৳{toBanglaNumber(product.yesterday)}
             </p>
           </div>
 
           <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
-            <p className="text-sm text-gray-500">গত সপ্তাহ</p>
+            <p className="text-sm text-gray-500">
+              গত সপ্তাহ
+            </p>
+
             <p className="mt-2 text-xl font-bold">
               ৳{toBanglaNumber(product.lastWeek)}
             </p>
           </div>
 
           <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
-            <p className="text-sm text-gray-500">গত মাস</p>
+            <p className="text-sm text-gray-500">
+              গত মাস
+            </p>
+
             <p className="mt-2 text-xl font-bold">
               ৳{toBanglaNumber(product.lastMonth)}
             </p>
@@ -185,6 +232,7 @@ async function ProductContent({ slug }: { slug: string }) {
           <h2 className="text-2xl font-bold text-gray-900">
             🏪 বাজারভিত্তিক বর্তমান দাম
           </h2>
+
           <p className="mt-2 text-gray-600">
             বিভিন্ন বাজারে এই পণ্যের সর্বনিম্ন ও সর্বোচ্চ দাম।
           </p>
@@ -198,12 +246,15 @@ async function ProductContent({ slug }: { slug: string }) {
                   <th className="px-5 py-4 font-bold text-gray-800">
                     বাজার
                   </th>
+
                   <th className="px-5 py-4 font-bold text-gray-800">
                     বিভাগ
                   </th>
+
                   <th className="px-5 py-4 font-bold text-gray-800">
                     সর্বনিম্ন
                   </th>
+
                   <th className="px-5 py-4 font-bold text-gray-800">
                     সর্বোচ্চ
                   </th>
@@ -264,7 +315,10 @@ function ProductLoading() {
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((item) => (
-            <div key={item} className="h-32 rounded-2xl bg-gray-200" />
+            <div
+              key={item}
+              className="h-32 rounded-2xl bg-gray-200"
+            />
           ))}
         </div>
       </div>
@@ -272,16 +326,14 @@ function ProductLoading() {
   );
 }
 
-export default async function ProductPage({
+export default function ProductPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params;
-
   return (
     <Suspense fallback={<ProductLoading />}>
-      <ProductContent slug={slug} />
+      <ProductContent params={params} />
     </Suspense>
   );
 }
