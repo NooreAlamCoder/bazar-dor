@@ -2,29 +2,16 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
 
 export default function AuthButtons() {
   const router = useRouter();
 
-  const [session, setSession] = useState<
-    typeof authClient.$Infer.Session | null
-  >(null);
-
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadSession() {
-      const { data } = await authClient.getSession();
-
-      setSession(data);
-      setLoading(false);
-    }
-
-    loadSession();
-  }, []);
+  const {
+    data: session,
+    isPending: loading,
+  } = authClient.useSession();
 
   async function handleSignOut() {
     const { error } = await authClient.signOut();
@@ -34,7 +21,6 @@ export default function AuthButtons() {
       return;
     }
 
-    setSession(null);
     toast.success("সাইন আউট হয়েছে");
     router.refresh();
   }
@@ -43,6 +29,7 @@ export default function AuthButtons() {
     return (
       <div className="flex items-center gap-2">
         <div className="h-9 w-16 animate-pulse rounded-lg bg-gray-200" />
+
         <div className="h-9 w-20 animate-pulse rounded-lg bg-gray-200" />
       </div>
     );
@@ -72,6 +59,7 @@ export default function AuthButtons() {
     <div className="flex items-center gap-2">
       <div className="hidden items-center gap-2 rounded-lg bg-green-50 px-3 py-2 sm:flex">
         <span>👤</span>
+
         <span className="max-w-[120px] truncate text-sm font-semibold text-green-700">
           {session.user.name}
         </span>

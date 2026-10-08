@@ -6,11 +6,27 @@ const client = await clientPromise;
 const db = client.db(process.env.MONGODB_DB || "bazar_dor");
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL,
+
   database: mongodbAdapter(db, {
     client,
   }),
 
   emailAndPassword: {
     enabled: true,
+  },
+
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ["google", "github"],
+    },
+  },
+
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    },
   },
 });

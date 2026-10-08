@@ -1,11 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
+import { connection } from "next/server";
+
 import { getProducts } from "@/lib/api";
 import type { Product } from "@/types/product";
 
 function toBanglaNumber(value: number | string) {
-  return String(value).replace(/\d/g, (digit) => "০১২৩৪৫৬৭৮৯"[Number(digit)]);
+  return String(value).replace(
+    /\d/g,
+    (digit) => "০১২৩৪৫৬৭৮৯"[Number(digit)]
+  );
 }
 
 function getUnit(unit: string) {
@@ -58,6 +63,7 @@ function ProductCard({ product }: { product: Product }) {
       <div className="flex items-end justify-between">
         <div>
           <p className="text-sm text-gray-500">আজকের দাম</p>
+
           <p className="text-2xl font-bold text-gray-900">
             ৳{toBanglaNumber(product.today)}
           </p>
@@ -87,6 +93,7 @@ function PriceSection({
           <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">
             {icon} {title}
           </h2>
+
           <div className="mt-2 h-1 w-16 rounded-full bg-green-600" />
         </div>
       </div>
@@ -98,7 +105,10 @@ function PriceSection({
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard
+              key={product.id}
+              product={product}
+            />
           ))}
         </div>
       )}
@@ -107,6 +117,10 @@ function PriceSection({
 }
 
 async function HomeContent() {
+  // Next.js 16 Cache Components:
+  // এই page-এ API request-এর জন্য request-time rendering প্রয়োজন।
+  await connection();
+
   const products = await getProducts();
 
   const risers = [...products]
@@ -162,26 +176,34 @@ async function HomeContent() {
         </div>
       </section>
 
-      {/* Main content */}
+      {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 pb-16">
+        {/* Top Risers */}
         <PriceSection
           title="আজ সবচেয়ে বেশি বেড়েছে"
           icon="📈"
           products={risers}
         />
 
+        {/* Top Fallers */}
         <PriceSection
           title="আজ সবচেয়ে বেশি কমেছে"
           icon="📉"
           products={fallers}
         />
 
-        <section id="সব-পণ্য" className="scroll-mt-32">
+        {/* All Products */}
+        <section
+          id="সব-পণ্য"
+          className="scroll-mt-32"
+        >
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">
               🛒 সব পণ্য
             </h2>
+
             <div className="mt-2 h-1 w-16 rounded-full bg-green-600" />
+
             <p className="mt-3 text-gray-600">
               বাংলাদেশের নিত্যপ্রয়োজনীয় পণ্যের বর্তমান বাজারদর।
             </p>
@@ -194,7 +216,10 @@ async function HomeContent() {
           ) : (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                />
               ))}
             </div>
           )}
@@ -208,10 +233,13 @@ function HomeLoading() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-12">
       <div className="animate-pulse">
+        {/* Hero Skeleton */}
         <div className="h-80 rounded-3xl bg-gray-200" />
 
+        {/* Heading Skeleton */}
         <div className="mt-12 h-8 w-64 rounded bg-gray-200" />
 
+        {/* Product Skeleton */}
         <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((item) => (
             <div
