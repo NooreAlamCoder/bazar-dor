@@ -29,7 +29,6 @@ export default function AuthButtons() {
     return (
       <div className="flex items-center gap-2">
         <div className="h-9 w-16 animate-pulse rounded-lg bg-gray-200" />
-
         <div className="h-9 w-20 animate-pulse rounded-lg bg-gray-200" />
       </div>
     );
@@ -57,13 +56,15 @@ export default function AuthButtons() {
 
   return (
     <div className="flex items-center gap-2">
-      <div className="hidden items-center gap-2 rounded-lg bg-green-50 px-3 py-2 sm:flex">
+      <Link
+        href="/profile"
+        className="hidden items-center gap-2 rounded-lg bg-green-50 px-3 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-100 sm:flex"
+      >
         <span>👤</span>
-
-        <span className="max-w-[120px] truncate text-sm font-semibold text-green-700">
+        <span className="max-w-[120px] truncate">
           {session.user.name}
         </span>
-      </div>
+      </Link>
 
       <button
         type="button"
