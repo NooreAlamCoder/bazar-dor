@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import "./globals.css";
+import { Toaster } from "react-hot-toast";
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -29,6 +30,7 @@ export default function RootLayout({
   return (
     <html lang="bn">
       <body className="min-h-screen bg-[#f4f8f3] text-gray-900 antialiased">
+        <Toaster position="top-center" />
         <div className="flex min-h-screen flex-col">
           <Suspense fallback={<HeaderLoading />}>
             <Header />

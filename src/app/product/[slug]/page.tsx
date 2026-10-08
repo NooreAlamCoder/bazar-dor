@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
+
 import { getProducts } from "@/lib/api";
+import { getServerSession } from "@/lib/auth-server";
 import type { Product } from "@/types/product";
 
 function toBanglaNumber(value: number | string) {
@@ -27,6 +29,13 @@ async function ProductContent({
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  // 🔐 Protected route
+  const session = await getServerSession();
+
+  if (!session) {
+    redirect("/signin");
+  }
+
   const { slug } = await params;
 
   const products = await getProducts();
@@ -87,8 +96,7 @@ async function ProductContent({
           <div>
             <div className="mb-4 flex flex-wrap gap-2">
               <span className="rounded-full bg-green-50 px-4 py-2 text-sm font-semibold text-green-700">
-                {product.categoryIcon}{" "}
-                {product.categoryNameBn}
+                {product.categoryIcon} {product.categoryNameBn}
               </span>
 
               <span className="rounded-full bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700">
@@ -146,40 +154,28 @@ async function ProductContent({
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">
-              আজকের দাম
-            </p>
-
+            <p className="text-sm text-gray-500">আজকের দাম</p>
             <p className="mt-2 text-2xl font-bold text-green-700">
               ৳{toBanglaNumber(product.today)}
             </p>
           </div>
 
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">
-              সর্বনিম্ন দাম
-            </p>
-
+            <p className="text-sm text-gray-500">সর্বনিম্ন দাম</p>
             <p className="mt-2 text-2xl font-bold text-gray-900">
               ৳{toBanglaNumber(minimumPrice)}
             </p>
           </div>
 
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">
-              সর্বোচ্চ দাম
-            </p>
-
+            <p className="text-sm text-gray-500">সর্বোচ্চ দাম</p>
             <p className="mt-2 text-2xl font-bold text-gray-900">
               ৳{toBanglaNumber(maximumPrice)}
             </p>
           </div>
 
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">
-              গড় দাম
-            </p>
-
+            <p className="text-sm text-gray-500">গড় দাম</p>
             <p className="mt-2 text-2xl font-bold text-gray-900">
               ৳{toBanglaNumber(averagePrice.toFixed(0))}
             </p>
@@ -195,30 +191,21 @@ async function ProductContent({
 
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
-            <p className="text-sm text-gray-500">
-              গতকাল
-            </p>
-
+            <p className="text-sm text-gray-500">গতকাল</p>
             <p className="mt-2 text-xl font-bold">
               ৳{toBanglaNumber(product.yesterday)}
             </p>
           </div>
 
           <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
-            <p className="text-sm text-gray-500">
-              গত সপ্তাহ
-            </p>
-
+            <p className="text-sm text-gray-500">গত সপ্তাহ</p>
             <p className="mt-2 text-xl font-bold">
               ৳{toBanglaNumber(product.lastWeek)}
             </p>
           </div>
 
           <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
-            <p className="text-sm text-gray-500">
-              গত মাস
-            </p>
-
+            <p className="text-sm text-gray-500">গত মাস</p>
             <p className="mt-2 text-xl font-bold">
               ৳{toBanglaNumber(product.lastMonth)}
             </p>

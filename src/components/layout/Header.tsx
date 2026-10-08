@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import AuthButtons from "@/components/auth/AuthButtons";
+
 const categories = [
   { name: "চাল", slug: "chal", icon: "🍚" },
   { name: "ডাল", slug: "dal", icon: "🫘" },
@@ -60,7 +62,6 @@ export default function Header() {
     <header className="w-full border-b border-gray-200 bg-white">
       {/* Top Header */}
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        {/* Logo */}
         <Link href="/" className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-green-600">
             <img
@@ -76,27 +77,13 @@ export default function Header() {
             </h1>
 
             <p className="text-xs text-gray-500">
-              বুধবার, ৮ অক্টোবর, ২০২৬
+              বৃহস্পতিবার, ৮ অক্টোবর, ২০২৬
             </p>
           </div>
         </Link>
 
-        {/* Auth Buttons */}
-        <div className="flex items-center gap-2">
-          <Link
-            href="/signin"
-            className="hidden rounded-lg px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-100 sm:block"
-          >
-            সাইন ইন
-          </Link>
-
-          <Link
-            href="/signup"
-            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700"
-          >
-            সাইন আপ
-          </Link>
-        </div>
+        {/* Authentication Buttons */}
+        <AuthButtons />
       </div>
 
       {/* Category Navigation */}
