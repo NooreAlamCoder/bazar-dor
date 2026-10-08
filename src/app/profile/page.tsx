@@ -8,10 +8,7 @@ import { authClient } from "@/lib/auth-client";
 export default function ProfilePage() {
   const router = useRouter();
 
-  const {
-    data: session,
-    isPending,
-  } = authClient.useSession();
+  const { data: session, isPending } = authClient.useSession();
 
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
@@ -22,7 +19,11 @@ export default function ProfilePage() {
       <main className="mx-auto max-w-2xl px-4 py-16">
         <div className="animate-pulse rounded-2xl bg-white p-6 shadow-sm">
           <div className="h-8 w-40 rounded bg-gray-200" />
+
+          <div className="mt-6 h-20 w-full rounded-xl bg-gray-200" />
+
           <div className="mt-6 h-11 w-full rounded-lg bg-gray-200" />
+
           <div className="mt-4 h-11 w-32 rounded-lg bg-gray-200" />
         </div>
       </main>
@@ -41,6 +42,11 @@ export default function ProfilePage() {
 
     if (!trimmedName) {
       toast.error("নাম লিখুন");
+      return;
+    }
+
+    if (!session) {
+      toast.error("সেশন পাওয়া যায়নি");
       return;
     }
 
@@ -63,7 +69,10 @@ export default function ProfilePage() {
     }
 
     setName("");
+
     toast.success("প্রোফাইল সফলভাবে আপডেট হয়েছে");
+
+    router.refresh();
   }
 
   async function handleSignOut() {
@@ -79,6 +88,7 @@ export default function ProfilePage() {
     }
 
     toast.success("সফলভাবে সাইন আউট হয়েছে");
+
     router.push("/");
     router.refresh();
   }
@@ -86,6 +96,7 @@ export default function ProfilePage() {
   return (
     <main className="min-h-[calc(100vh-200px)] px-4 py-10 md:py-16">
       <div className="mx-auto max-w-2xl">
+        {/* Heading */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900">
             আমার প্রোফাইল
@@ -96,6 +107,7 @@ export default function ProfilePage() {
           </p>
         </div>
 
+        {/* Profile Card */}
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
           {/* User Information */}
           <div className="mb-6 flex items-center justify-between gap-4 rounded-xl bg-green-50 p-4">
@@ -124,7 +136,7 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Right Side */}
+            {/* Sign Out */}
             <button
               type="button"
               onClick={handleSignOut}
