@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import AuthButtons from "@/components/auth/AuthButtons";
 
@@ -55,14 +56,42 @@ const tickerItems = [
   },
 ];
 
+function getBanglaDate() {
+  return new Intl.DateTimeFormat("bn-BD", {
+    timeZone: "Asia/Dhaka",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date());
+}
+
 export default function Header() {
   const pathname = usePathname();
+
+  const [currentDate, setCurrentDate] = useState("");
+
+  useEffect(() => {
+    // প্রথমবার তারিখ সেট করা
+    setCurrentDate(getBanglaDate());
+
+    // দিন পরিবর্তন হলে নতুন তারিখ দেখাবে
+    const interval = setInterval(() => {
+      setCurrentDate(getBanglaDate());
+    }, 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <header className="w-full border-b border-gray-200 bg-white">
       {/* Top Header */}
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link href="/" className="flex items-center gap-3">
+        {/* Logo + Date */}
+        <Link
+          href="/"
+          className="flex items-center gap-3"
+        >
           <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-green-600">
             <img
               src="/assets/logo-icon.png"
@@ -76,13 +105,13 @@ export default function Header() {
               বাজার দর
             </h1>
 
-            <p className="text-xs text-gray-500">
-              বৃহস্পতিবার, ৮ অক্টোবর, ২০২৬
+            <p className="min-h-[20px] text-xs text-gray-500">
+              {currentDate || "তারিখ লোড হচ্ছে..."}
             </p>
           </div>
         </Link>
 
-        {/* Authentication Buttons */}
+        {/* Authentication */}
         <AuthButtons />
       </div>
 

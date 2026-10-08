@@ -15,6 +15,7 @@ export default function ProfilePage() {
 
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
 
   if (isPending) {
     return (
@@ -65,6 +66,23 @@ export default function ProfilePage() {
     toast.success("প্রোফাইল সফলভাবে আপডেট হয়েছে");
   }
 
+  async function handleSignOut() {
+    setSigningOut(true);
+
+    const { error } = await authClient.signOut();
+
+    setSigningOut(false);
+
+    if (error) {
+      toast.error(error.message || "সাইন আউট করা যায়নি");
+      return;
+    }
+
+    toast.success("সফলভাবে সাইন আউট হয়েছে");
+    router.push("/");
+    router.refresh();
+  }
+
   return (
     <main className="min-h-[calc(100vh-200px)] px-4 py-10 md:py-16">
       <div className="mx-auto max-w-2xl">
@@ -79,22 +97,49 @@ export default function ProfilePage() {
         </div>
 
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <div className="mb-6 flex items-center gap-4 rounded-xl bg-green-50 p-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-600 text-2xl text-white">
-              👤
+          {/* User Information */}
+          <div className="mb-6 flex items-center justify-between gap-4 rounded-xl bg-green-50 p-4">
+            {/* Left Side */}
+            <div className="flex min-w-0 items-center gap-4">
+              {session.user.image ? (
+                <img
+                  src={session.user.image}
+                  alt={session.user.name || "Profile"}
+                  className="h-14 w-14 shrink-0 rounded-full border border-gray-200 object-cover"
+                />
+              ) : (
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-green-600 text-2xl text-white">
+                  👤
+                </div>
+              )}
+
+              <div className="min-w-0">
+                <p className="truncate text-lg font-bold text-gray-900">
+                  {session.user.name}
+                </p>
+
+                <p className="truncate text-sm text-gray-500">
+                  {session.user.email}
+                </p>
+              </div>
             </div>
 
-            <div className="min-w-0">
-              <p className="text-lg font-bold text-gray-900">
-                {session.user.name}
-              </p>
+            {/* Right Side */}
+            <button
+              type="button"
+              onClick={handleSignOut}
+              disabled={signingOut}
+              className="flex shrink-0 items-center gap-2 text-sm font-semibold text-red-600 transition hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <span>↩</span>
 
-              <p className="truncate text-sm text-gray-500">
-                {session.user.email}
-              </p>
-            </div>
+              <span>
+                {signingOut ? "সাইন আউট হচ্ছে..." : "সাইন আউট"}
+              </span>
+            </button>
           </div>
 
+          {/* Update Name */}
           <form onSubmit={handleSubmit}>
             <label
               htmlFor="name"
