@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { getProducts } from "@/lib/api";
@@ -24,10 +25,7 @@ function getUnit(unit: string) {
   return units[unit] || unit;
 }
 
-function calculatePercentage(
-  current: number,
-  previous: number
-) {
+function calculatePercentage(current: number, previous: number) {
   if (previous === 0) {
     return 0;
   }
@@ -35,16 +33,10 @@ function calculatePercentage(
   return ((current - previous) / previous) * 100;
 }
 
-function getPriceChange(
-  current: number,
-  previous: number
-) {
+function getPriceChange(current: number, previous: number) {
   const difference = current - previous;
 
-  const percentage = calculatePercentage(
-    current,
-    previous
-  );
+  const percentage = calculatePercentage(current, previous);
 
   if (difference > 0) {
     return {
@@ -98,10 +90,7 @@ function PriceChangeBadge({
   );
 }
 
-function getPriceColor(
-  current: number,
-  previous: number
-) {
+function getPriceColor(current: number, previous: number) {
   if (current > previous) {
     return "text-red-600";
   }
@@ -113,11 +102,7 @@ function getPriceColor(
   return "text-gray-700";
 }
 
-function ProductHeader({
-  product,
-}: {
-  product: Product;
-}) {
+function ProductHeader({ product }: { product: Product }) {
   return (
     <section className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm md:p-7">
       <div className="grid gap-6 md:grid-cols-[150px_1fr_170px] md:items-center">
@@ -206,6 +191,11 @@ async function ProductContent({
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  /*
+   * Next.js 16 request-time data fix
+   */
+  await connection();
+
   // Protected route
   const session = await getServerSession();
 
@@ -217,9 +207,7 @@ async function ProductContent({
 
   const products = await getProducts();
 
-  const product = products.find(
-    (item) => item.slug === slug
-  );
+  const product = products.find((item) => item.slug === slug);
 
   if (!product) {
     notFound();
@@ -231,20 +219,12 @@ async function ProductContent({
 
   const minimumPrice =
     product.markets.length > 0
-      ? Math.min(
-          ...product.markets.map(
-            (market) => market.min
-          )
-        )
+      ? Math.min(...product.markets.map((market) => market.min))
       : product.today;
 
   const maximumPrice =
     product.markets.length > 0
-      ? Math.max(
-          ...product.markets.map(
-            (market) => market.max
-          )
-        )
+      ? Math.max(...product.markets.map((market) => market.max))
       : product.today;
 
   const marketAverages = product.markets.map(
@@ -259,9 +239,7 @@ async function ProductContent({
         ) / marketAverages.length
       : product.today;
 
-  const roundedAveragePrice = Math.round(
-    averagePrice
-  );
+  const roundedAveragePrice = Math.round(averagePrice);
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 md:py-12">
@@ -447,7 +425,6 @@ async function ProductContent({
 
       {/* Market Prices */}
       <section className="mt-8 rounded-3xl border border-gray-200 bg-white p-5 shadow-sm md:p-7">
-        {/* Section Heading */}
         <div className="mb-5">
           <h2 className="text-2xl font-bold text-gray-900">
             বাজারভিত্তিক আজকের দাম
@@ -458,87 +435,62 @@ async function ProductContent({
           </p>
         </div>
 
-        {/* Table */}
         <div className="overflow-hidden rounded-2xl border border-gray-200">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[760px] border-collapse text-left">
-              {/* Table Header */}
-              <thead>
-                <tr className="border-b-2 border-gray-300 bg-white">
-                  <th className="px-5 py-4 text-sm font-bold text-gray-700">
+            <table className="w-full min-w-[760px] text-left">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-5 py-4 text-sm font-bold text-gray-800">
                     বাজার
                   </th>
 
-                  <th className="px-5 py-4 text-sm font-bold text-gray-700">
+                  <th className="px-5 py-4 text-sm font-bold text-gray-800">
                     বিভাগ
                   </th>
 
-                  <th className="px-5 py-4 text-sm font-bold text-gray-700">
+                  <th className="px-5 py-4 text-sm font-bold text-green-700">
                     সর্বনিম্ন
                   </th>
 
-                  <th className="px-5 py-4 text-sm font-bold text-gray-700">
+                  <th className="px-5 py-4 text-sm font-bold text-red-600">
                     সর্বোচ্চ
                   </th>
 
-                  <th className="px-5 py-4 text-right text-sm font-bold text-gray-700">
+                  <th className="px-5 py-4 text-sm font-bold text-gray-800">
                     গড়
                   </th>
                 </tr>
               </thead>
 
-              {/* Dynamic Table Rows */}
               <tbody>
-                {product.markets.map((market, index) => {
+                {product.markets.map((market) => {
                   const marketAverage = Math.round(
                     (market.min + market.max) / 2
                   );
 
-                  const isEven = index % 2 === 0;
-
                   return (
                     <tr
                       key={`${market.market}-${market.division}`}
-                      className={`
-                        border-b border-gray-400
-                        transition
-                        ${
-                          isEven
-                            ? "bg-white"
-                            : "bg-[#eef4ee]"
-                        }
-                        hover:bg-green-50
-                      `}
+                      className="border-t border-gray-100 transition hover:bg-green-50/50"
                     >
-                      {/* Market */}
-                      <td className="px-5 py-4 text-sm font-medium text-gray-800">
+                      <td className="px-5 py-4 text-sm font-semibold text-gray-900">
                         {market.market}
                       </td>
 
-                      {/* Division */}
-                      <td className="px-5 py-4 text-sm text-gray-700">
+                      <td className="px-5 py-4 text-sm text-gray-600">
                         {market.division}
                       </td>
 
-                      {/* Minimum */}
-                      <td className="px-5 py-4 text-sm font-medium text-gray-700">
-                        <span className="font-bold text-green-600">
-                          {toBanglaNumber(market.min)}
-                        </span>{" "}
-                        টাকা
+                      <td className="px-5 py-4 text-sm font-bold text-green-600">
+                        ৳{toBanglaNumber(market.min)} টাকা
                       </td>
 
-                      {/* Maximum */}
-                      <td className="px-5 py-4 text-sm font-medium text-gray-700">
-                        <span className="font-bold text-red-600">
-                          {toBanglaNumber(market.max)}
-                        </span>{" "}
-                        টাকা
+                      <td className="px-5 py-4 text-sm font-bold text-red-600">
+                        ৳{toBanglaNumber(market.max)} টাকা
                       </td>
 
-                      {/* Average */}
-                      <td className="px-5 py-4 text-right text-sm font-bold text-gray-800">
-                        {toBanglaNumber(marketAverage)} টাকা
+                      <td className="px-5 py-4 text-sm font-bold text-gray-700">
+                        ৳{toBanglaNumber(marketAverage)} টাকা
                       </td>
                     </tr>
                   );
@@ -566,25 +518,12 @@ function ProductLoading() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-12">
       <div className="animate-pulse">
-        {/* Breadcrumb */}
         <div className="h-5 w-48 rounded bg-gray-200" />
 
-        {/* Header */}
+        {/* Header skeleton */}
         <div className="mt-6 h-48 rounded-3xl bg-gray-200" />
 
-        {/* Summary */}
-        <div className="mt-8 h-8 w-56 rounded bg-gray-200" />
-
-        <div className="mt-5 grid gap-4 md:grid-cols-3">
-          {[1, 2, 3].map((item) => (
-            <div
-              key={item}
-              className="h-36 rounded-2xl bg-gray-200"
-            />
-          ))}
-        </div>
-
-        {/* Historical */}
+        {/* Summary skeleton */}
         <div className="mt-8 h-8 w-56 rounded bg-gray-200" />
 
         <div className="mt-5 grid gap-4 sm:grid-cols-3">
@@ -596,7 +535,19 @@ function ProductLoading() {
           ))}
         </div>
 
-        {/* Market Table */}
+        {/* Historical skeleton */}
+        <div className="mt-8 h-8 w-56 rounded bg-gray-200" />
+
+        <div className="mt-5 grid gap-4 sm:grid-cols-3">
+          {[1, 2, 3].map((item) => (
+            <div
+              key={item}
+              className="h-32 rounded-2xl bg-gray-200"
+            />
+          ))}
+        </div>
+
+        {/* Table skeleton */}
         <div className="mt-8 h-8 w-64 rounded bg-gray-200" />
 
         <div className="mt-5 h-72 rounded-2xl bg-gray-200" />
