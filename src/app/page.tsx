@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -5,6 +6,7 @@ import { connection } from "next/server";
 
 import { getProducts } from "@/lib/api";
 import type { Product } from "@/types/product";
+import CurrentDate from "@/components/home/CurrentDate";
 
 function toBanglaNumber(value: number | string) {
   return String(value).replace(
@@ -105,10 +107,7 @@ function PriceSection({
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-            />
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       )}
@@ -117,8 +116,7 @@ function PriceSection({
 }
 
 async function HomeContent() {
-  // Next.js 16 Cache Components:
-  // এই page-এ API request-এর জন্য request-time rendering প্রয়োজন।
+  // Next.js 16 Cache Components
   await connection();
 
   const products = await getProducts();
@@ -135,13 +133,14 @@ async function HomeContent() {
 
   return (
     <>
-      {/* Hero */}
+      {/* Hero Banner */}
       <section className="mx-auto max-w-7xl px-4 py-8 md:py-10">
         <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
           <div className="grid items-center gap-8 px-6 py-10 md:grid-cols-2 md:px-10 lg:px-12">
             <div>
+              {/* Automatically Updating Bangladesh Date */}
               <span className="inline-flex rounded-full bg-green-50 px-4 py-2 text-sm font-medium text-green-700">
-                আজকের বাজারদর
+                <CurrentDate />
               </span>
 
               <h1 className="mt-5 text-4xl font-extrabold leading-tight text-gray-900 md:text-5xl lg:text-6xl">
@@ -193,10 +192,7 @@ async function HomeContent() {
         />
 
         {/* All Products */}
-        <section
-          id="সব-পণ্য"
-          className="scroll-mt-32"
-        >
+        <section id="সব-পণ্য" className="scroll-mt-32">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">
               🛒 সব পণ্য
@@ -216,10 +212,7 @@ async function HomeContent() {
           ) : (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {products.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                />
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           )}

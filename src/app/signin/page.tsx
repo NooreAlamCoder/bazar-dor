@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -16,59 +17,99 @@ export default function SignInPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [githubLoading, setGithubLoading] = useState(false);
 
+  // লগইনের পর কোথায় ফিরে যাবে তা নির্ধারণ
+  function getCallbackURL() {
+    const params = new URLSearchParams(window.location.search);
+    const requestedURL = params.get("callbackURL");
+
+    if (
+      requestedURL &&
+      requestedURL.startsWith("/") &&
+      !requestedURL.startsWith("//")
+    ) {
+      return requestedURL;
+    }
+
+    return "/";
+  }
+
+  // Email and Password Sign In
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!email || !password) {
+    if (!email.trim() || !password) {
       toast.error("ইমেইল ও পাসওয়ার্ড দিন");
       return;
     }
 
+    const callbackURL = getCallbackURL();
+
     setLoading(true);
 
-    const { error } = await authClient.signIn.email({
-      email,
-      password,
-    });
+    try {
+      const { error } = await authClient.signIn.email({
+        email: email.trim(),
+        password,
+        callbackURL,
+      });
 
-    setLoading(false);
+      if (error) {
+        toast.error(error.message || "সাইন ইন করা যায়নি");
+        return;
+      }
 
-    if (error) {
-      toast.error(error.message || "সাইন ইন করা যায়নি");
-      return;
+      toast.success("সফলভাবে সাইন ইন হয়েছে");
+
+      router.replace(callbackURL);
+      router.refresh();
+    } catch {
+      toast.error("সাইন ইন করার সময় সমস্যা হয়েছে");
+    } finally {
+      setLoading(false);
     }
-
-    toast.success("সফলভাবে সাইন ইন হয়েছে");
-
-    router.push("/");
-    router.refresh();
   }
 
+  // Google Sign In
   async function handleGoogleSignIn() {
+    const callbackURL = getCallbackURL();
+
     setGoogleLoading(true);
 
-    const { error } = await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "/",
-    });
+    try {
+      const { error } = await authClient.signIn.social({
+        provider: "google",
+        callbackURL,
+      });
 
-    if (error) {
+      if (error) {
+        toast.error(error.message || "Google দিয়ে সাইন ইন করা যায়নি");
+        setGoogleLoading(false);
+      }
+    } catch {
+      toast.error("Google দিয়ে সাইন ইন করার সময় সমস্যা হয়েছে");
       setGoogleLoading(false);
-      toast.error(error.message || "Google দিয়ে সাইন ইন করা যায়নি");
     }
   }
 
+  // GitHub Sign In
   async function handleGithubSignIn() {
+    const callbackURL = getCallbackURL();
+
     setGithubLoading(true);
 
-    const { error } = await authClient.signIn.social({
-      provider: "github",
-      callbackURL: "/",
-    });
+    try {
+      const { error } = await authClient.signIn.social({
+        provider: "github",
+        callbackURL,
+      });
 
-    if (error) {
+      if (error) {
+        toast.error(error.message || "GitHub দিয়ে সাইন ইন করা যায়নি");
+        setGithubLoading(false);
+      }
+    } catch {
+      toast.error("GitHub দিয়ে সাইন ইন করার সময় সমস্যা হয়েছে");
       setGithubLoading(false);
-      toast.error(error.message || "GitHub দিয়ে সাইন ইন করা যায়নি");
     }
   }
 
@@ -102,10 +143,12 @@ export default function SignInPage() {
             <input
               id="email"
               type="email"
+              autoComplete="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="you@example.com"
               disabled={anyLoading}
+              required
               className="h-[41px] w-full rounded-[8px] border border-gray-200 bg-white px-[12px] text-[14px] text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-100 disabled:cursor-not-allowed disabled:bg-gray-50"
             />
           </div>
@@ -122,10 +165,12 @@ export default function SignInPage() {
             <input
               id="password"
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              placeholder="কমপক্ষে ৮ অক্ষর"
+              placeholder="আপনার পাসওয়ার্ড দিন"
               disabled={anyLoading}
+              required
               className="h-[41px] w-full rounded-[8px] border border-gray-200 bg-white px-[12px] text-[14px] text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-100 disabled:cursor-not-allowed disabled:bg-gray-50"
             />
           </div>

@@ -25,3 +25,28 @@ button,
 a {
   -webkit-tap-highlight-color: transparent;
 }
+
+
+.price-ticker-track {
+  animation: price-ticker-scroll 65s linear infinite;
+}
+
+.price-ticker-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes price-ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .price-ticker-track {
+    animation: none;
+  }
+}

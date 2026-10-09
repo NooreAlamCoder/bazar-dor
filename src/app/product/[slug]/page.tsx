@@ -197,13 +197,18 @@ async function ProductContent({
   await connection();
 
   // Protected route
-  const session = await getServerSession();
+  
+const { slug } = await params;
 
-  if (!session) {
-    redirect("/signin");
-  }
+// Protected route
+const session = await getServerSession();
 
-  const { slug } = await params;
+if (!session) {
+  redirect(
+    `/signin?callbackURL=${encodeURIComponent(`/product/${slug}`)}`
+  );
+}
+
 
   const products = await getProducts();
 
