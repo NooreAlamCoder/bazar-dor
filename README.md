@@ -13,9 +13,7 @@
 ## 🚀 Live Website
 
 **Live Site:**  
-`https://`
-
-> Vercel deployment-এর পরে এখানে তোমার actual live URL বসাতে হবে।
+`https://bazar-dor-kappa.vercel.app/`
 
 ---
 
